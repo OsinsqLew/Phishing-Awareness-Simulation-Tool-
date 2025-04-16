@@ -10,7 +10,7 @@ Pipfile:
 # [...]
 
 [[source]]
-# PyTorch CUDA 12.6 repo[[source]]
+# PyTorch repo (currently CUDA 12.6)
 name = "pytorch"
 url = "https://download.pytorch.org/whl/cu126"
 verify_ssl = true
