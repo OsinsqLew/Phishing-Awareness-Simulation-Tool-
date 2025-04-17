@@ -15,8 +15,9 @@ torchaudio = {index = "pytorch", version = "==2.6.0"}
 torchvision = {index = "pytorch", version = "==0.21.0"}
 transformers = "~=4.51"
 accelerate = "~=1.6"
+bitsandbytes = "~=0.45"
 
 [dev-packages]
 
 [requires]
-python_version = "3.12"
+python_version = "3.13"
