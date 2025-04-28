@@ -3,19 +3,8 @@ name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
 
-[[source]]
-# PyTorch repo (currently CUDA 12.6)
-name = "pytorch"
-url = "https://download.pytorch.org/whl/cu126"
-verify_ssl = true
-
 [packages]
-torch = {index = "pytorch", version = "==2.6.0"}
-torchaudio = {index = "pytorch", version = "==2.6.0"}
-torchvision = {index = "pytorch", version = "==0.21.0"}
-transformers = "~=4.51"
-accelerate = "~=1.6"
-bitsandbytes = "~=0.45"
+llama-cpp-python = "~=0.3.8"
 
 [dev-packages]
 
