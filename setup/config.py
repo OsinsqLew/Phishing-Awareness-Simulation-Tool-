@@ -17,11 +17,11 @@ def get_from_config(file: str, section: str) -> configparser.SectionProxy:
         KeyError if section/parameter of a provided name does not exist.
     """
     config = configparser.ConfigParser()
-    config_file = Path(__file__).parent.parent / "configs" / file
+    config_file = Path(__file__).parent/ file
 
     if not config_file.is_file():
         raise FileNotFoundError(
-            f"No file named {file} in {Path(__file__).parent.parent.name}/configs"
+            f"No file named {file} in {Path(__file__).parent.name}/"
         )
 
     config.read(config_file)
