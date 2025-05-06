@@ -18,11 +18,11 @@ from mail_content_generator import MailContentGenerator
 
 
 generator = MailContentGenerator()
-email = generator.generate_email('marek@example.com', 'www.example.com')
+subject, body = generator.generate_email('marek@example.com', 'www.example.com')
 
-print("\nGenerated Email\n")
-print(f'Subject: {email[0]}\n')
-print(f'Body: {email[1]}')
+print("\nGenerated Email\n" + "-" * 50)
+print(f'Subject: {subject}\n' + "-" * 50)
+print(f'Body: {body}')
 ```
 
 ```text
@@ -45,4 +45,29 @@ Thank you for your prompt attention to this matter.
 Best regards,
 HR Department
 [COMPANY NAME]
+```
+
+## Wysyłanie maili
+### Generowanie App Password
+- https://myaccount.google.com/apppasswords
+
+### Modyfikowanie `config.py`
+- Zmienić `MAIL_SENDER` na poprawny adres email
+- W `MAIL_PASSWORD` wpisać wygenerowane App Password
+```py
+# [...]
+
+################################################################
+# mail_sender.py
+MAIL_SENDER = 'example@gmail.com'
+MAIL_PASSWORD = '<PASSWORD>'
+
+# [...]
+```
+
+### Przykładowe użycie 
+```py
+from mail_sender import send_email
+
+send_email("Email Subject", "<h1>Hello There</h1>", ["example@gmail.com"])
 ```
