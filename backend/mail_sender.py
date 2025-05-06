@@ -4,7 +4,7 @@ from email.mime.text import MIMEText
 from config import MAIL_SENDER, MAIL_PASSWORD
 
 
-def send_email(subject: str, html_body: str, recipients: [str]):
+def send_email(subject: str, html_body: str, recipients: [str]) -> None:
     """
     Sends an HTML email with the specified subject and body to a list of recipients.
 
@@ -40,6 +40,7 @@ def send_email(subject: str, html_body: str, recipients: [str]):
 
     # connect to the SMTP server and send the email
     with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
+        smtp_server.set_debuglevel(True)  # prints more info
         smtp_server.login(MAIL_SENDER, MAIL_PASSWORD)
         smtp_server.sendmail(MAIL_SENDER, recipients, msg.as_string())
 

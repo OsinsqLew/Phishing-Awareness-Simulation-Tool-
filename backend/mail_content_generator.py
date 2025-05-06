@@ -5,6 +5,17 @@ from llama_cpp import Llama
 
 
 class MailContentGenerator:
+    """
+    A class for generating phishing email content using a pre-trained language model.
+
+    This class simulates phishing email generation by leveraging predefined scenarios.
+
+    Attributes:
+        model_path (str): Path to the pre-trained language model.
+        scenarios (list): A list of phishing scenarios, each containing a persona, hook, and placeholder.
+        system_prompt (str): A system-level prompt that defines the behavior and constraints for email generation.
+    """
+
     model_path = MODEL_PATH
     scenarios = [
         {"persona": "IT Support", "hook": "forced password reset after 'unusual login activity'", "ph": "[LINK]"},
@@ -47,7 +58,14 @@ class MailContentGenerator:
     <3–6 concise paragraphs (total ~80–150 words), plain text only, using `[LINK]` and `[USER]` exclusively>   
     """
 
-    def __init__(self, n_ctx: int = DEFAULT_N_CTX, n_threads: int = DEFAULT_N_THREADS):
+    def __init__(self, n_ctx: int = DEFAULT_N_CTX, n_threads: int = DEFAULT_N_THREADS) -> None:
+        """
+        Initializes the MailContentGenerator with the specified context size and thread count.
+
+        Args:
+            n_ctx (int): The context size for the language model.
+            n_threads (int): The number of threads to use for the language model.
+        """
         self.n_ctx = n_ctx
         self.n_threads = n_threads
 
@@ -57,7 +75,17 @@ class MailContentGenerator:
             n_threads=self.n_threads,
         )
 
-    def build_messages(self, idx: int | None = None):
+    def build_messages(self, idx: int | None = None) -> list[dict[str, str]]:
+        """
+        Builds a list of messages to be used as input for the language model.
+
+        Args:
+            idx (int | None): The index of the scenario to use. If None, a random scenario is selected.
+
+        Returns:
+            list: A list of messages, including the system prompt and user prompt.
+        """
+
         if idx is None:
             idx = random.randrange(len(self.scenarios))
         s = self.scenarios[idx]
@@ -72,7 +100,17 @@ class MailContentGenerator:
         ]
 
     @classmethod
-    def build_prompt(cls, messages):
+    def build_prompt(cls, messages) -> str:
+        """
+        Builds a formatted prompt string from a list of messages.
+
+        Args:
+            messages (list): A list of messages, each containing a role and content.
+
+        Returns:
+            str: A formatted prompt string for the language model.
+        """
+
         prompt = ""
         for message in messages:
             if message["role"] == "system":
@@ -82,7 +120,19 @@ class MailContentGenerator:
         prompt += "<|assistant|>\n"
         return prompt
 
-    def generate_email(self, user, link, idx: int | None = None):
+    def generate_email(self, user, link, idx: int | None = None) -> tuple[str, str]:
+        """
+        Generates a phishing email based on the specified user and link.
+
+        Args:
+            user (str): The recipient's email address or name to personalize the email.
+            link (str): The link to include in the email.
+            idx (int | None): The index of the scenario to use. If None, a random scenario is selected.
+
+        Returns:
+            tuple: A tuple containing the email subject and body.
+        """
+
         messages = self.build_messages(idx)
         prompt = self.build_prompt(messages)
         output = self.llm(
