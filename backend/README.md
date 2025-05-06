@@ -76,7 +76,7 @@ send_email("Email Subject", "<h1>Hello There</h1>", ["example@gmail.com"])
 
 ![e-mail html body](https://github.com/user-attachments/assets/e1f9d2ab-6cc0-409b-843f-2fedde72cf83)
 <div display="flex">
-    <img src="https://github.com/user-attachments/assets/d703072b-07e8-498c-8817-ff3cfc6ddff6" alt="e-mail message screenshot" width="50%" />
+    <img src="https://github.com/user-attachments/assets/d703072b-07e8-498c-8817-ff3cfc6ddff6" alt="e-mail message screenshot" width="40%" />
 </div>
 
 
