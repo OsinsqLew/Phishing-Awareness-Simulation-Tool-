@@ -51,6 +51,8 @@ HR Department
 ### Generowanie App Password
 - https://myaccount.google.com/apppasswords
 
+![Generowanie App Password](https://github.com/user-attachments/assets/890283d1-0fb6-4550-82e0-b529ebb33068)
+
 ### Modyfikowanie `config.py`
 - Zmienić `MAIL_SENDER` na poprawny adres email
 - W `MAIL_PASSWORD` wpisać wygenerowane App Password
