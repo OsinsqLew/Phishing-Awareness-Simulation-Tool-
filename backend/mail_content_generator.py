@@ -109,7 +109,7 @@ class MailContentGenerator:
 
 if __name__ == "__main__":
     generator = MailContentGenerator()
-    email = generator.generate_email('marek@example.com', 'www.example.com')
+    subject, body = generator.generate_email('marek@example.com', 'www.example.com')
     print("\nGenerated Email\n" + "-" * 50)
-    print(f'Subject: {email[0]}\n' + "-" * 50)
-    print(f'Body: {email[1]}')
+    print(f'Subject: {subject}\n' + "-" * 50)
+    print(f'Body: {body}')
