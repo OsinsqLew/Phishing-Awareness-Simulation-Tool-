@@ -25,7 +25,7 @@ class DB:
             return result
         return{ "error": "Invalid token or user ID." }
 
-    def get_all_users(self):
+    def get_all_users(self) -> list[dict]:
         cursor = self.my_db.cursor(dictionary=True)
         cursor.execute("SELECT seen, clicked, tags, phishing_type from emails;")
         result = cursor.fetchall()
