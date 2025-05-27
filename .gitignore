@@ -1,2 +1,5 @@
 .venv
 config.ini
+*.pyc
+auxilary
+__pycache__
