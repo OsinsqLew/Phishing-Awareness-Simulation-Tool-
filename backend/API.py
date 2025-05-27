@@ -5,21 +5,53 @@ from db.DB import DB
 app = FastAPI()
 db = DB("DB_connection")
 
-def validate_token(token: str) -> bool:
+class CreateUserRequest(BaseModel):
+    email_address: str
+    first_name: str
+    last_name: str
+    password: str
+
+@app.post("/create_user")
+def create_user(request: CreateUserRequest) -> dict:
     """
-    Validate the authentication token.
+    Create a new user in the database.
 
     Args:
-        token: The authentication token.
+        request: A CreateUserRequest object containing user details.
 
     Returns:
-        True if the token is valid, False otherwise.
+        A dictionary with a success message.
     """
-    pass
+    try:
+        db.add_user(
+            request.email_address,
+            request.first_name,
+            request.last_name,
+            request.password
+        )
+        return {"message": "User created successfully."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@app.post("/login")
+def login(user_id: int, password: str) -> dict:
+    """
+    Log in a user and return an authentication token.
 
+    Args:
+        user_id: The ID of the user.
+        password: The user's password.
+
+    Returns:
+        A dictionary containing the authentication token.
+    """
+    token = db.login(user_id, password)
+    if not token:
+        raise HTTPException(status_code=401, detail="Invalid credentials.")
+    return {"token": token}
 
 @app.get("/get_user_data")
-def get_user_data(user_id: int, token: str) -> list[dict]:
+def get_user_data(user_id: int, token: str) -> dict:
     """
     Get user data from the database.
 
@@ -30,22 +62,8 @@ def get_user_data(user_id: int, token: str) -> list[dict]:
     Returns:
         A dictionary containing user data.
     """
-    if validate_token(token):
-        return db.get_user_data(user_id)
-    else:
-        raise HTTPException(status_code=401, detail="Invalid token")
-
-
-@app.get("/get_all_users")
-def get_all_users() -> list[dict]:
-    """
-    Get all users data from the database.
-
-    Returns:
-        A list of dictionaries containing user data.
-    """
-    return db.get_all_users()
-from db.DB import DB
+    data = db.get_user_data(user_id, token)
+    return data
 
 @app.get("/statistics")
 def get_statistics():
@@ -59,6 +77,7 @@ def get_statistics():
 
 
 if __name__ == "__main__":
+    pass
     # data = db.get_all_users()
     # print(data)
 
