@@ -34,21 +34,26 @@ def create_user(request: CreateUserRequest) -> dict:
         raise HTTPException(status_code=500, detail=str(e))
     
 @app.post("/login")
-def login(user_id: int, password: str) -> dict:
+def login(email: str, password: str) -> dict:
     """
     Log in a user and return an authentication token.
 
     Args:
-        user_id: The ID of the user.
+        email: The email address of the user.
         password: The user's password.
 
     Returns:
         A dictionary containing the authentication token.
     """
-    token = db.login(user_id, password)
-    if not token:
-        raise HTTPException(status_code=401, detail="Invalid credentials.")
-    return {"token": token}
+    try:
+        user_id, token = db.login(email, password)
+        return {"user_id": user_id, "token": token}
+    except Exception as e:
+        if "Invalid credentials" in str(e):
+            raise HTTPException(status_code=401, detail="Invalid credentials.")
+        else:
+            raise HTTPException(status_code=500, detail="An error occurred during login.")
+
 
 @app.get("/get_user_data")
 def get_user_data(user_id: int, token: str) -> dict:
@@ -62,8 +67,36 @@ def get_user_data(user_id: int, token: str) -> dict:
     Returns:
         A dictionary containing user data.
     """
-    data = db.get_user_data(user_id, token)
-    return data
+    try:
+        data = db.get_user_data(user_id, token)
+        return data
+    except Exception as e:
+        if "Invalid token or user ID" in str(e):
+            raise HTTPException(status_code=401, detail="Invalid token or user ID.")
+        else:
+            raise HTTPException(status_code=500, detail="An error occurred while fetching user data.")
+
+
+@app.get("/user_statistics")
+def get_user_statistics(user_id: int, token: str) -> dict:
+    """
+    Get user statistics from the database.
+
+    Args:
+        user_id: The ID of the user.
+        token: The authentication token.
+
+    Returns:
+        A dictionary containing user statistics.
+    """
+    try:
+        data = db.get_user_stats(user_id, token)
+        return data
+    except Exception as e:
+        if "Invalid token or user ID" in str(e):
+            raise HTTPException(status_code=401, detail="Invalid token or user ID.")
+        else:
+            raise HTTPException(status_code=500, detail="An error occurred while fetching user statistics.")
 
 @app.get("/statistics")
 def get_statistics():
