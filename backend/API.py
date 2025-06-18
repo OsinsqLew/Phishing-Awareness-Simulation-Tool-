@@ -1,5 +1,9 @@
+import os
+
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
+
 from db.DB import DB
 
 app = FastAPI()
@@ -107,6 +111,34 @@ def get_statistics():
     """
     data = db.get_all_users()
     return data
+
+@app.get("/home_page")
+def email_clicked(reference: str):
+    """
+    Endpoint to handle phishing link clicks.
+    
+    This endpoint is a placeholder for handling clicks on phishing links.
+    It currently returns a simple message indicating that the link was clicked.
+    
+    Returns:
+        A dictionary with a message indicating the link was clicked.
+    """
+    try:
+        db.phising_clicked(reference)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing phishing link: {str(e)}")
+    return {"message": "Phishing link clicked!"}
+
+@app.get("/track/report_phising.png")
+def track_report_phishing(reference: str):
+    """
+    Tracking image for phishing reports.
+    """
+
+    static_path = os.getcwd()
+    image_path = os.path.join(static_path, "setup/reportphishbutton.png")
+    db.phising_seen(reference)
+    return FileResponse(image_path, media_type="image/png")
 
 
 if __name__ == "__main__":

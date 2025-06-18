@@ -5,8 +5,37 @@ import jwt
 import random
 import string
 import hashlib
+import base64
+import json
 
-#zwrocic uwage czy jest zwracany json
+def generate_phising_link(user_id, mail_id):
+    """
+    Generates a phishing link for the user.
+    
+    Args:
+        user_id (int): The ID of the user.
+        mail_id (int): The ID of the email.
+
+    Returns:
+        str: A formatted phishing link.
+    """
+    data = {"user_id": user_id, "mail_id": mail_id}
+    encoded_data = base64.urlsafe_b64encode(json.dumps(data).encode()).decode()
+    return f"http://localhost:8000/home_page?reference={encoded_data}"
+
+def decode_phishing_link(encoded_link: str) -> dict:
+    """
+    Decodes a phishing link to extract user and mail IDs.
+    
+    Args:
+        encoded_link (str): The encoded phishing link.
+
+    Returns:
+        dict: A dictionary containing user_id and mail_id.
+    """
+    decoded_data = base64.urlsafe_b64decode(encoded_link).decode()
+    return json.loads(decoded_data)
+
 def generate_salt(length: int = 4):
     characters = string.ascii_letters + string.digits  # Litery i cyfry
     return ''.join(random.choice(characters) for _ in range(length))
@@ -33,7 +62,7 @@ class DB:
         if self.verify_token(user_id, token):
             try:
                 cursor = self.my_db.cursor(dictionary=True)
-                cursor.execute("SELECT first_name, last_name, tags FROM users WHERE id = %s", (user_id,))
+                cursor.execute("SELECT email, first_name, last_name, tags FROM users WHERE id = %s", (user_id,))
                 result = cursor.fetchone()
                 cursor.close()
                 return result
@@ -111,7 +140,65 @@ class DB:
         finally:
             cursor.close()
 
+    def phising_clicked(self, reference: str) -> None:
+        """Updates the database to indicate that a phishing link was clicked."""
+        decoded_data = decode_phishing_link(reference)
+        user_id = decoded_data.get("user_id")
+        mail_id = decoded_data.get("mail_id")
+        if user_id is None or mail_id is None:
+            raise Exception("Invalid reference data.")
+        
+        query = "UPDATE emails SET clicked = 1 WHERE user_id = %s AND email_id = %s"
+        cursor = self.my_db.cursor()
+        try:
+            cursor.execute(query, (user_id, mail_id))
+            self.my_db.commit()
+        except Exception as e:
+            self.my_db.rollback()
+            raise Exception(f"Error updating phishing click status: {e}")
+        finally:
+            cursor.close()
+
+    def phising_seen(self, reference: str) -> None:
+        """Updates the database to indicate that a phishing link was seen."""
+        decoded_data = decode_phishing_link(reference)
+        user_id = decoded_data.get("user_id")
+        mail_id = decoded_data.get("mail_id")
+        if user_id is None or mail_id is None:
+            raise Exception("Invalid reference data.")
+        
+        query = "UPDATE emails SET seen = 1 WHERE user_id = %s AND email_id = %s"
+        cursor = self.my_db.cursor()
+        try:
+            cursor.execute(query, (user_id, mail_id))
+            self.my_db.commit()
+        except Exception as e:
+            self.my_db.rollback()
+            raise Exception(f"Error updating phishing seen status: {e}")
+        finally:
+            cursor.close()
+
+    def add_user_email(self, user_id: int, phishing_type: str | None, tags: str | None) -> None:
+        """Adds a phishing email record for a user."""
+        query = (
+            "INSERT INTO emails (user_id, phishing_type, tags) VALUES (%s, %s, %s)"
+        )
+        cursor = self.my_db.cursor()
+        try:
+            cursor.execute(query, (user_id, phishing_type, tags))
+            self.my_db.commit()
+        except Exception as e:
+            self.my_db.rollback()
+            raise Exception(f"Error adding user email row: {e}")
+        finally:
+            cursor.close()
+            return cursor.lastrowid
+
 if __name__ =="__main__":
     db = DB("DB_connection")
-    result = db.get_user_stats(user_id=3, token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW5kX3RpbWUiOiIyMDI1LTA2LTAyIDE1OjUwOjA3In0.XbLLt24kEnmu45_miBhRhCMt07QBH6-VOD2TzhIaicg")
-    print(result)
+    # id, token = db.login("cisco@gmail.com", "cisco")
+    # result = db.get_user_data(id, token)
+    # print(result)
+    ref = generate_phising_link(3, 1)
+    db.phising_clicked("eyJ1c2VyX2lkIjogMywgIm1haWxfaWQiOiAxfQ==")
+

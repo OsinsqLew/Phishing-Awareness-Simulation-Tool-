@@ -10,7 +10,7 @@ CHECK (email_address REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
 );
 
 CREATE TABLE emails (
-email_id INT NOT NULL,
+email_id INT AUTO_INCREMENT,
 user_id INT NOT NULL,
 seen BOOLEAN DEFAULT FALSE,
 clicked BOOLEAN DEFAULT FALSE,
