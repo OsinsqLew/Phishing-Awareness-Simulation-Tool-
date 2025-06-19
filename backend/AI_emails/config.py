@@ -6,5 +6,5 @@ DEFAULT_N_THREADS = 8  # ilość CPU threads (dostosuj do swojego procesora)
 
 ################################################################
 # mail_sender.py
-MAIL_SENDER = 'tabletasuspl@gmail.com'
-MAIL_PASSWORD = 'sqpm ucxe hbtp tbmy'
+MAIL_SENDER = 'example@gmail.com'
+MAIL_PASSWORD = '<PASSWORD>'
