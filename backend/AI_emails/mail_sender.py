@@ -1,17 +1,18 @@
 import smtplib
 from email.mime.text import MIMEText
 
-from config import MAIL_SENDER, MAIL_PASSWORD
+from backend.AI_emails.config import MAIL_SENDER, MAIL_PASSWORD
+from backend.AI_emails.mail_content_generator import MailContentGenerator
 
 
-def send_email(subject: str, html_body: str, recipients: [str]) -> None:
+def send_email(subject: str, html_body: str, recipients: list[dict]) -> None:
     """
     Sends an HTML email with the specified subject and body to a list of recipients.
 
     Parameters:
         subject (str): The subject line of the email.
         html_body (str): The HTML content of the email body.
-        recipients (list of str): A list of recipient email addresses.
+        recipients (list of dicts): A list of dictiopnaries that map recipients to theirs email addresses.
 
     Returns:
         None
@@ -36,38 +37,23 @@ def send_email(subject: str, html_body: str, recipients: [str]) -> None:
     msg = MIMEText(html_body, 'html')
     msg['Subject'] = subject
     msg['From'] = MAIL_SENDER
-    msg['To'] = ', '.join(recipients)
+    msg['To'] = ', '.join(recipients.values())
+    print(f"Sending email to: {', '.join(recipients.values())}")
 
     # connect to the SMTP server and send the email
     with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
         smtp_server.set_debuglevel(True)  # prints more info
         smtp_server.login(MAIL_SENDER, MAIL_PASSWORD)
-        smtp_server.sendmail(MAIL_SENDER, recipients, msg.as_string())
+        smtp_server.sendmail(MAIL_SENDER, recipients.values(), msg.as_string())
 
     print("Email sent!")
 
-
-if __name__ == '__main__':
-    message = """
-    <!DOCTYPE html>
-    <html>
-    <head></head>
-    <body>
-        <h1>Welcome to Our Service!</h1>
-        <p>Hi there,</p>
-        <p>Thank you for signing up for our service. We're excited to have you on board!</p>
-        <p>To get started, please visit your <a href="https://example.com/dashboard">dashboard</a>.</p>
-        <div class="image-container">
-        <!-- image src: https://pixabay.com/illustrations/tv-television-televising-video-8760950/ -->
-        <img src="https://cdn.pixabay.com/photo/2024/05/14/11/37/tv-8760950_1280.png" width="200" />
-    </div>
-        <p>If you have any questions, feel free to reply to this email or check out our <a href="https://example.com/help">help center</a>.</p>
-        <div class="footer">
-            <p>Best regards,</p>
-            <p>The Example Team</p>
-        </div>
-    </body>
-    </html>
-    """
-
-    send_email("Email Subject", message, ["example@gmail.com"])
+#TODO: Add phising_type and tags parameters to the function
+def generate_n_send(db, recipient, recipient_email, recipient_id, user_tags):
+    mcg = MailContentGenerator()
+    link = db.generate_phishing_link(recipient_id)
+    print(f"Generated link: {link}")
+    subject, message = mcg.generate_email(recipient, link, user_tags)
+    message = f'<html><body>{message}</body><img src="https://localhost:8000/track/report_phising.png" width="10" height="10"></html>'
+    send_email(subject, message, {recipient: recipient_email})
+    db.add_user_email(recipient_id, None, None)

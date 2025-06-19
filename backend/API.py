@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
-from db.DB import DB
+from db.database import DB
 
 app = FastAPI()
 db = DB("DB_connection")
@@ -139,12 +139,3 @@ def track_report_phishing(reference: str):
     image_path = os.path.join(static_path, "setup/reportphishbutton.png")
     db.phising_seen(reference)
     return FileResponse(image_path, media_type="image/png")
-
-
-if __name__ == "__main__":
-    pass
-    # data = db.get_all_users()
-    # print(data)
-
-    # import uvicorn
-    # uvicorn.run(app)

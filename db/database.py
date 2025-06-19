@@ -8,21 +8,6 @@ import hashlib
 import base64
 import json
 
-def generate_phising_link(user_id, mail_id):
-    """
-    Generates a phishing link for the user.
-    
-    Args:
-        user_id (int): The ID of the user.
-        mail_id (int): The ID of the email.
-
-    Returns:
-        str: A formatted phishing link.
-    """
-    data = {"user_id": user_id, "mail_id": mail_id}
-    encoded_data = base64.urlsafe_b64encode(json.dumps(data).encode()).decode()
-    return f"http://localhost:8000/home_page?reference={encoded_data}"
-
 def decode_phishing_link(encoded_link: str) -> dict:
     """
     Decodes a phishing link to extract user and mail IDs.
@@ -34,6 +19,7 @@ def decode_phishing_link(encoded_link: str) -> dict:
         dict: A dictionary containing user_id and mail_id.
     """
     decoded_data = base64.urlsafe_b64decode(encoded_link).decode()
+    print(f"Decoded data: {decoded_data}")
     return json.loads(decoded_data)
 
 def generate_salt(length: int = 4):
@@ -43,7 +29,7 @@ def generate_salt(length: int = 4):
 class DB:
     def __init__(self, section_name:str):
         data = config.get_from_config("config.ini", section_name)
-        self.secret = config.get_from_config("config.ini", "jwt")
+        self.secret = config.get_from_config("config.ini", "jwt")["secret"]
         self.my_db = mysql.connector.connect(
             host=data["host"],
             port=3306,
@@ -52,18 +38,32 @@ class DB:
             database=data["schema_name"],
             autocommit=True
         )
+
+    def get_users_number(self) -> int:
+        """Returns the number of users in the database."""
+        cursor = self.my_db.cursor()
+        cursor.execute("SELECT COUNT(*) FROM users;")
+        result = cursor.fetchone()
+        cursor.close()
+        return result[0] if result else 0
+
     def verify_token(self, user_id:str, token:str) -> bool:
-        decoded = jwt.decode(token, key=self.secret["secret"], algorithms=["HS256"])
+        try:
+            decoded = jwt.decode(token, key=self.secret, algorithms=["HS256"])
+        except Exception as e:
+            print(f"Token verification failed: {e}")
+            return False
         if user_id == decoded["id"] and datetime.strptime(decoded["end_time"], "%Y-%m-%d %H:%M:%S") > datetime.now():
             return True
         return False
 
     def get_user_data(self, user_id: int, token: str) -> dict:
-        if self.verify_token(user_id, token):
+        if  token == self.secret or self.verify_token(user_id, token):
             try:
                 cursor = self.my_db.cursor(dictionary=True)
-                cursor.execute("SELECT email, first_name, last_name, tags FROM users WHERE id = %s", (user_id,))
+                cursor.execute("SELECT email_address, first_name, last_name, tags FROM users WHERE id = %s", (user_id,))
                 result = cursor.fetchone()
+                print(f"Fetched user data: {result}")
                 cursor.close()
                 return result
             except Exception as e:
@@ -178,27 +178,48 @@ class DB:
         finally:
             cursor.close()
 
+    def get_next_email_id(self, user_id: int) -> int:
+        """Retrieves the next email ID for a user."""
+        query = "SELECT MAX(email_id) FROM emails WHERE user_id = %s"
+        cursor = self.my_db.cursor()
+        try:
+            cursor.execute(query, (user_id,))
+            result = cursor.fetchone()
+            return result[0] + 1 if result[0] is not None else 1
+        except Exception as e:
+            raise Exception(f"Error fetching next email ID: {e}")
+        finally:
+            cursor.close()
+
     def add_user_email(self, user_id: int, phishing_type: str | None, tags: str | None) -> None:
         """Adds a phishing email record for a user."""
         query = (
-            "INSERT INTO emails (user_id, phishing_type, tags) VALUES (%s, %s, %s)"
+            "INSERT INTO emails (user_id, email_id, phishing_type, tags) VALUES (%s, %s, %s, %s)"
         )
         cursor = self.my_db.cursor()
         try:
-            cursor.execute(query, (user_id, phishing_type, tags))
+            email_id = self.get_next_email_id(user_id)
+            cursor.execute(query, (user_id, email_id, phishing_type, tags))
             self.my_db.commit()
+            print(f"Added user email row: user_id={user_id}, email_id={email_id}, phishing_type={phishing_type}, tags={tags}")
         except Exception as e:
             self.my_db.rollback()
             raise Exception(f"Error adding user email row: {e}")
         finally:
             cursor.close()
-            return cursor.lastrowid
 
-if __name__ =="__main__":
-    db = DB("DB_connection")
-    # id, token = db.login("cisco@gmail.com", "cisco")
-    # result = db.get_user_data(id, token)
-    # print(result)
-    ref = generate_phising_link(3, 1)
-    db.phising_clicked("eyJ1c2VyX2lkIjogMywgIm1haWxfaWQiOiAxfQ==")
+    def generate_phishing_link(self, user_id):
+        """
+        Generates a phishing link for the user.
+        
+        Args:
+            user_id (int): The ID of the user.
+            mail_id (int): The ID of the email.
 
+        Returns:
+            str: A formatted phishing link.
+        """
+        email_id = self.get_next_email_id(user_id)
+        data = {"user_id": user_id, "mail_id": email_id}
+        encoded_data = base64.urlsafe_b64encode(json.dumps(data).encode()).decode()
+        return f"http://localhost:8000/home_page?reference={encoded_data}"

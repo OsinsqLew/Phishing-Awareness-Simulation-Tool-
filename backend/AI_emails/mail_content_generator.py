@@ -1,6 +1,6 @@
 import random
 import re
-from config import MODEL_PATH, DEFAULT_N_CTX, DEFAULT_N_THREADS
+from backend.AI_emails.config import MODEL_PATH, DEFAULT_N_CTX, DEFAULT_N_THREADS
 from llama_cpp import Llama
 
 
@@ -75,11 +75,12 @@ class MailContentGenerator:
             n_threads=self.n_threads,
         )
 
-    def build_messages(self, idx: int | None = None) -> list[dict[str, str]]:
+    def build_messages(self, tags, idx: int | None = None) -> list[dict[str, str]]:
         """
         Builds a list of messages to be used as input for the language model.
 
         Args:
+            tags (list): A list of tags describing the targeted person.
             idx (int | None): The index of the scenario to use. If None, a random scenario is selected.
 
         Returns:
@@ -92,6 +93,7 @@ class MailContentGenerator:
         user_prompt = (
             f"Generate one phishing email **as if sent by an <{s['persona']}> persona**. "
             f"The scenario is {s['hook']}. "
+            f"The tags describing targeted person are: {', '.join(tags)}, use that information to personalize the email. "
             "Remember the output format and safety rules."
         )
         return [
@@ -120,20 +122,21 @@ class MailContentGenerator:
         prompt += "<|assistant|>\n"
         return prompt
 
-    def generate_email(self, user, link, idx: int | None = None) -> tuple[str, str]:
+    def generate_email(self, user, link, tags, idx: int | None = None) -> tuple[str, str]:
         """
         Generates a phishing email based on the specified user and link.
 
         Args:
             user (str): The recipient's email address or name to personalize the email.
             link (str): The link to include in the email.
+            tags (list): A list of tags describing the targeted person.
             idx (int | None): The index of the scenario to use. If None, a random scenario is selected.
 
         Returns:
             tuple: A tuple containing the email subject and body.
         """
 
-        messages = self.build_messages(idx)
+        messages = self.build_messages(tags, idx)
         prompt = self.build_prompt(messages)
         output = self.llm(
             prompt,
@@ -152,14 +155,7 @@ class MailContentGenerator:
         body_extracted = re.sub(r"^Subject:.*?\n", "", generated_text, flags=re.IGNORECASE | re.DOTALL)
         # replace [USER] and [LINK]
         body_extracted = re.sub(r"\[USER]", user, body_extracted, flags=re.IGNORECASE)
-        body = re.sub(r"\[LINK]", link, body_extracted, flags=re.IGNORECASE).strip()
+        body = re.sub(r"\[LINK]", f'<a href="{link}">Link</a>', body_extracted, flags=re.IGNORECASE).strip()
+        body = body.replace("\n", "<br>")
 
         return subject, body
-
-
-if __name__ == "__main__":
-    generator = MailContentGenerator()
-    subject, body = generator.generate_email('marek@example.com', 'www.example.com')
-    print("\nGenerated Email\n" + "-" * 50)
-    print(f'Subject: {subject}\n' + "-" * 50)
-    print(f'Body: {body}')
