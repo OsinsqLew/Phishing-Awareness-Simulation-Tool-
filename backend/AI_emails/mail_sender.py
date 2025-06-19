@@ -5,7 +5,7 @@ from backend.AI_emails.config import MAIL_SENDER, MAIL_PASSWORD
 from backend.AI_emails.mail_content_generator import MailContentGenerator
 
 
-def send_email(subject: str, html_body: str, recipients: list[dict]) -> None:
+def send_email(subject: str, html_body: str, recipients: list[str]) -> None:
     """
     Sends an HTML email with the specified subject and body to a list of recipients.
 
@@ -37,23 +37,24 @@ def send_email(subject: str, html_body: str, recipients: list[dict]) -> None:
     msg = MIMEText(html_body, 'html')
     msg['Subject'] = subject
     msg['From'] = MAIL_SENDER
-    msg['To'] = ', '.join(recipients.values())
-    print(f"Sending email to: {', '.join(recipients.values())}")
+    msg['To'] = ', '.join(recipients.values())  # FIXME:
+    print(f"Sending email to: {', '.join(recipients.values())}")  # FIXME:
 
     # connect to the SMTP server and send the email
     with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
         smtp_server.set_debuglevel(True)  # prints more info
         smtp_server.login(MAIL_SENDER, MAIL_PASSWORD)
-        smtp_server.sendmail(MAIL_SENDER, recipients.values(), msg.as_string())
+        smtp_server.sendmail(MAIL_SENDER, recipients.values(), msg.as_string())  # FIXME:
 
     print("Email sent!")
 
-#TODO: Add phising_type and tags parameters to the function
+
+# TODO: Add phising_type and tags parameters to the function
 def generate_n_send(db, recipient, recipient_email, recipient_id, user_tags):
     mcg = MailContentGenerator()
     link = db.generate_phishing_link(recipient_id)
     print(f"Generated link: {link}")
     subject, message = mcg.generate_email(recipient, link, user_tags)
     message = f'<html><body>{message}</body><img src="https://localhost:8000/track/report_phising.png" width="10" height="10"></html>'
-    send_email(subject, message, {recipient: recipient_email})
+    send_email(subject, message, {recipient: recipient_email})  # FIXME:
     db.add_user_email(recipient_id, None, None)
