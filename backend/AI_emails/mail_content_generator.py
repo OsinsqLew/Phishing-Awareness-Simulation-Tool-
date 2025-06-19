@@ -1,7 +1,33 @@
+import os.path
+import sys
+import urllib.request
+
+from backend.AI_emails.config import MODEL_PATH, DEFAULT_N_CTX, DEFAULT_N_THREADS
+
 import random
 import re
-from backend.AI_emails.config import MODEL_PATH, DEFAULT_N_CTX, DEFAULT_N_THREADS
 from llama_cpp import Llama
+
+
+def progress_bar(count, block_size, total_size):
+    """
+    A reporthook function to display AI model download progress bar.
+    """
+    percent = int(count * block_size * 100 / total_size)
+    percent = min(100, percent)
+
+    # calculate downloaded size in MB for display
+    downloaded_mb = (count * block_size) / (1024 * 1024)
+    total_mb = total_size / (1024 * 1024) if total_size != -1 else float('inf') # Handle unknown total_size
+
+    # display progress
+    if total_size != -1:
+        # '\r' - return the cursor to the beginning of the line
+        # \33[3m - blue color, \33[0m - reset color
+        sys.stdout.write(f"\rDownloading AI model: {percent}% [{downloaded_mb:.2f}/{total_mb:.2f} MB]")
+    else:
+        sys.stdout.write(f"\rDownloading AI model: {downloaded_mb:.2f} MB (unknown total size)")
+    sys.stdout.flush()
 
 
 class MailContentGenerator:
@@ -66,6 +92,16 @@ class MailContentGenerator:
             n_ctx (int): The context size for the language model.
             n_threads (int): The number of threads to use for the language model.
         """
+
+        # download the model if it doesn't exist
+        if not os.path.exists(self.model_path):
+            os.makedirs(os.path.dirname(self.model_path), exist_ok=True)
+            urllib.request.urlretrieve(
+                "https://huggingface.co/TheBloke/zephyr-7B-beta-GGUF/resolve/main/zephyr-7b-beta.Q4_K_M.gguf?download=true",
+                self.model_path,
+                reporthook=progress_bar,
+            )
+
         self.n_ctx = n_ctx
         self.n_threads = n_threads
 
