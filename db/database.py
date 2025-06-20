@@ -94,16 +94,16 @@ class DB:
             raise Exception("Invalid token or user ID.")
 
     
-    def add_user(self, email_address, first_name, last_name, password) -> None:
+    def add_user(self, email_address, first_name, last_name, password, tags) -> None:
         """Adds a new user to the database."""
         salt = generate_salt()
         hash_pass = hashlib.md5((password + salt).encode('utf-8')).hexdigest().strip()
         query = (
-            "INSERT INTO users (email_address, first_name, last_name, hash_pass, salt) VALUES (%s, %s, %s, %s, %s)"
+            "INSERT INTO users (email_address, first_name, last_name, hash_pass, salt, tags) VALUES (%s, %s, %s, %s, %s, %s)"
         )
         cursor = self.my_db.cursor()
         try:
-            cursor.execute(query, (email_address, first_name, last_name, hash_pass, salt))
+            cursor.execute(query, (email_address, first_name, last_name, hash_pass, salt, tags))
             self.my_db.commit()
         except Exception as e:
             self.my_db.rollback()

@@ -112,7 +112,7 @@ class MailContentGenerator:
 
         self.email_tags = None
 
-    def build_messages(self, tags, idx: int | None = None) -> list[dict[str, str]]:
+    def build_messages(self, tags: str | None, idx: int | None = None) -> list[dict[str, str]]:
         """
         Builds a list of messages to be used as input for the language model.
 
@@ -133,7 +133,7 @@ class MailContentGenerator:
         user_prompt = (
             f"Generate one phishing email **as if sent by an <{s['persona']}> persona**. "
             f"The scenario is {s['hook']}. "
-            f"The tags describing targeted person are: {', '.join(tags)}, use some of them to personalize the email. "
+            f"The tags describing targeted person are: {tags if tags else None}, use some of them to personalize the email. "
             "Remember the output format and safety rules."
         )
         return [

@@ -14,6 +14,7 @@ class CreateUserRequest(BaseModel):
     first_name: str
     last_name: str
     password: str
+    tags: str | None = None
 
 @app.post("/create_user")
 def create_user(request: CreateUserRequest) -> dict:

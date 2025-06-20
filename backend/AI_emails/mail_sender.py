@@ -49,7 +49,6 @@ def send_email(subject: str, html_body: str, recipient: str) -> None:
     print("Email sent!")
 
 
-# TODO: Add phising_type and tags parameters to the function
 def generate_n_send(db, recipient, recipient_email, recipient_id, user_tags):
     mcg = MailContentGenerator()
     link = db.generate_phishing_link(recipient_id)
