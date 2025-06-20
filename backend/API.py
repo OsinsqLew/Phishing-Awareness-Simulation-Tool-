@@ -34,7 +34,8 @@ def create_user(request: CreateUserRequest) -> dict:
             request.email_address,
             request.first_name,
             request.last_name,
-            request.password
+            request.password,
+            request.tags
         )
         return {"message": "User created successfully."}
     except Exception as e:
