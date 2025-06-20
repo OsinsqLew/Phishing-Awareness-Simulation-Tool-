@@ -61,3 +61,24 @@ curl -L "https://huggingface.co/TheBloke/zephyr-7B-beta-GGUF/resolve/main/zephyr
 ```
 Zmodyfikować `config.ini` i następnie `docker-compose up`\
 Udostępnić niezbędne porty z `Security Groups`
+
+<br>
+
+## Zrzuty ekranu
+
+![users](https://github.com/user-attachments/assets/c7a455a3-b40d-4d9c-9fa5-9011d46380d4)
+![emails](https://github.com/user-attachments/assets/544e2c19-57a5-480b-abc6-8b626f68ca39)
+
+<!--
+![IMG_2577](https://github.com/user-attachments/assets/4dccfbc2-9beb-4f1a-98e0-f7336634212e)
+![IMG_2578](https://github.com/user-attachments/assets/54831370-b846-4d54-bf9b-784a410bdc7c)
+![IMG_2579](https://github.com/user-attachments/assets/c335bfd7-c75e-487f-97ee-a690ac813c87)
+-->
+
+<div display="flex">
+  <img src="https://github.com/user-attachments/assets/4dccfbc2-9beb-4f1a-98e0-f7336634212e" width="45%" alt="email example 1"/>
+  <img src="https://github.com/user-attachments/assets/54831370-b846-4d54-bf9b-784a410bdc7c" width="45%" alt="email example 2"/>
+  <img src="https://github.com/user-attachments/assets/c335bfd7-c75e-487f-97ee-a690ac813c87" width="45%" alt="email example 3"/>
+</div>
+
+
