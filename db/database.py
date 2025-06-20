@@ -96,7 +96,6 @@ class DB:
         else:
             raise Exception("Invalid token or user ID.")
 
-    
     def add_user(self, email_address, first_name, last_name, password, tags) -> None:
         """Adds a new user to the database."""
         salt = generate_salt()
