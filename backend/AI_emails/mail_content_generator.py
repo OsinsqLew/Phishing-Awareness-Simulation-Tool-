@@ -2,11 +2,17 @@ import os.path
 import sys
 import urllib.request
 
-from backend.AI_emails.config import MODEL_PATH, DEFAULT_N_CTX, DEFAULT_N_THREADS
-
 import random
 import re
 from llama_cpp import Llama
+
+MODEL_URL = "https://huggingface.co/TheBloke/zephyr-7B-beta-GGUF/resolve/main/zephyr-7b-beta.Q4_K_M.gguf?download=true"
+MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "./models/zephyr-7b-beta.Q4_K_M.gguf")
+# można zmniejszyć/zwiększyć kontekst, zależnie od dostępnego VRAM/RAM
+DEFAULT_N_CTX = 4096
+# ilość CPU threads (dostosuj do swojego procesora)
+DEFAULT_N_THREADS = 8
+
 
 def progress_bar(count, block_size, total_size):
     """
@@ -17,7 +23,7 @@ def progress_bar(count, block_size, total_size):
 
     # calculate downloaded size in MB for display
     downloaded_mb = (count * block_size) / (1024 * 1024)
-    total_mb = total_size / (1024 * 1024) if total_size != -1 else float('inf') # Handle unknown total_size
+    total_mb = total_size / (1024 * 1024) if total_size != -1 else float('inf')  # handle unknown total_size
 
     # display progress
     if total_size != -1:
@@ -66,13 +72,15 @@ class MailContentGenerator:
     ]
     system_prompt = """\
     You are a cyber‑criminal crafting realistic phishing emails.  
-    Your goal is to deceive recipients into clicking or responding—leveraging urgency, authority, fear, curiosity, scarcity, reward, blackmail, or similar tactics.
+    Your goal is to deceive recipients into clicking or responding—leveraging urgency,
+    authority, fear, curiosity, scarcity, reward, blackmail, or similar tactics.
 
     Safety & style constraints:
     - Do not disclose that the email is fake.
     - Content should be as close to real phishing as possible.
     - Include fake domains, personal data, phone numbers, or email addresses.
-    - Use **only** `[LINK]` to denote any clickable URL and `[USER]` when addressing the recipient. Do **not** emit any other brackets, tags, or metadata.
+    - Use **only** `[LINK]` to denote any clickable URL and `[USER]` when addressing the recipient.
+    - Do **not** emit any other brackets, tags, or metadata.
     - You should reference genuine company names (like: Facebook, Amazon, X).
     - You should try to confuse and deceive.
     - Output **only** the email content; do not preface or append any commentary.
@@ -96,7 +104,7 @@ class MailContentGenerator:
         if not os.path.exists(self.model_path):
             os.makedirs(os.path.dirname(self.model_path), exist_ok=True)
             urllib.request.urlretrieve(
-                "https://huggingface.co/TheBloke/zephyr-7B-beta-GGUF/resolve/main/zephyr-7b-beta.Q4_K_M.gguf?download=true",
+                MODEL_URL,
                 self.model_path,
                 reporthook=progress_bar,
             )
@@ -112,7 +120,7 @@ class MailContentGenerator:
 
         self.email_tags = None
 
-    def build_messages(self, tags, idx: int | None = None) -> list[dict[str, str]]:
+    def build_messages(self, tags: list[str], idx: int | None = None) -> list[dict[str, str]]:
         """
         Builds a list of messages to be used as input for the language model.
 
@@ -133,7 +141,8 @@ class MailContentGenerator:
         user_prompt = (
             f"Generate one phishing email **as if sent by an <{s['persona']}> persona**. "
             f"The scenario is {s['hook']}. "
-            f"The tags describing targeted person are: {', '.join(tags)}, use some of them to personalize the email. "
+            f"The tags describing targeted person are: {', '.join(tags)}, "
+            "use that information to personalize the email. "
             "Remember the output format and safety rules."
         )
         return [
@@ -162,7 +171,7 @@ class MailContentGenerator:
         prompt += "<|assistant|>\n"
         return prompt
 
-    def generate_email(self, user, link, tags, idx: int | None = None) -> tuple[str, str]:
+    def generate_email(self, user, link, tags, idx: int | None = None) -> tuple[str, str, list[str]]:
         """
         Generates a phishing email based on the specified user and link.
 

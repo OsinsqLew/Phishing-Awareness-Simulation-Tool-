@@ -8,7 +8,6 @@ import hashlib
 import base64
 import json
 
-#TODO sprawdzic user id - int, poprawic w verify token
 
 def decode_phishing_link(encoded_link: str) -> dict:
     """
@@ -24,12 +23,14 @@ def decode_phishing_link(encoded_link: str) -> dict:
     print(f"Decoded data: {decoded_data}")
     return json.loads(decoded_data)
 
+
 def generate_salt(length: int = 4):
     characters = string.ascii_letters + string.digits  # Litery i cyfry
     return ''.join(random.choice(characters) for _ in range(length))
 
+
 class DB:
-    def __init__(self, section_name:str):
+    def __init__(self, section_name: str):
         data = config.get_from_config("config.ini", section_name)
         self.secret = config.get_from_config("config.ini", "jwt")["secret"]
         self.my_db = mysql.connector.connect(
@@ -60,7 +61,7 @@ class DB:
         return False
 
     def get_user_data(self, user_id: int, token: str) -> dict:
-        if  token == self.secret or self.verify_token(user_id, token):
+        if token == self.secret or self.verify_token(user_id, token):
             try:
                 cursor = self.my_db.cursor(dictionary=True)
                 cursor.execute("SELECT email_address, first_name, last_name, tags FROM users WHERE id = %s", (user_id,))
@@ -80,7 +81,7 @@ class DB:
         cursor.close()
         return result
     
-    def get_user_stats(self, user_id: int, token: str) -> dict[dict]:
+    def get_user_stats(self, user_id: int, token: str) -> dict:
         if self.verify_token(user_id, token):
             try:
                 cursor = self.my_db.cursor(dictionary=True)
@@ -93,7 +94,6 @@ class DB:
         else:
             raise Exception("Invalid token or user ID.")
 
-    
     def add_user(self, email_address, first_name, last_name, password) -> None:
         """Adds a new user to the database."""
         salt = generate_salt()
@@ -129,7 +129,10 @@ class DB:
 
             print(f"{str(password_hash) == given_hash}")
             if str(password_hash) == given_hash:
-                token = { "id": user_id, "end_time": f"{(datetime.now() + timedelta(hours=1)).strftime("%Y-%m-%d %H:%M:%S")}" }
+                token = {
+                    "id": user_id,
+                    "end_time": f"{(datetime.now() + timedelta(hours=1)).strftime("%Y-%m-%d %H:%M:%S")}"
+                }
                 token = jwt.encode(token, key=self.secret, algorithm="HS256")
                 return user_id, token
             else:
@@ -203,7 +206,12 @@ class DB:
             email_id = self.get_next_email_id(user_id)
             cursor.execute(query, (user_id, email_id, phishing_type, tags))
             self.my_db.commit()
-            print(f"Added user email row: user_id={user_id}, email_id={email_id}, phishing_type={phishing_type}, tags={tags}")
+            print(
+                f"Added user email row: user_id={user_id}, "
+                f"email_id={email_id}, "
+                f"phishing_type={phishing_type}, "
+                f"tags={tags}"
+            )
         except Exception as e:
             self.my_db.rollback()
             raise Exception(f"Error adding user email row: {e}")
