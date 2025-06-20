@@ -1,5 +1,6 @@
 import smtplib
 from email.mime.text import MIMEText
+import urllib.parse
 
 from backend.AI_emails.mail_content_generator import MailContentGenerator
 
