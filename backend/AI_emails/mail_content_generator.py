@@ -6,12 +6,14 @@ import random
 import re
 from llama_cpp import Llama
 
+import setup.config as config
+
 MODEL_URL = "https://huggingface.co/TheBloke/zephyr-7B-beta-GGUF/resolve/main/zephyr-7b-beta.Q4_K_M.gguf?download=true"
 MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "./models/zephyr-7b-beta.Q4_K_M.gguf")
 # można zmniejszyć/zwiększyć kontekst, zależnie od dostępnego VRAM/RAM
-DEFAULT_N_CTX = 4096
+DEFAULT_N_CTX = int(config.get_from_config("config.ini", "ai_model")["default_n_ctx"])
 # ilość CPU threads (dostosuj do swojego procesora)
-DEFAULT_N_THREADS = 8
+DEFAULT_N_THREADS = int(config.get_from_config("config.ini", "ai_model")["default_n_threads"])
 
 
 def progress_bar(count, block_size, total_size):

@@ -8,6 +8,8 @@ import hashlib
 import base64
 import json
 
+PUBLIC_IP_ADDRESS = config.get_from_config("config.ini", "server")["ip_addr"]
+
 
 def decode_phishing_link(encoded_link: str) -> dict:
     """
@@ -231,4 +233,4 @@ class DB:
         email_id = self.get_next_email_id(user_id)
         data = {"user_id": user_id, "mail_id": email_id}
         encoded_data = base64.urlsafe_b64encode(json.dumps(data).encode()).decode()
-        return f"http://localhost:8000/home_page?reference={encoded_data}"
+        return f"http://{PUBLIC_IP_ADDRESS}:8000/home_page?reference={encoded_data}"

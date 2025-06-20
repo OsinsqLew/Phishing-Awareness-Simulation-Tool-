@@ -26,15 +26,28 @@ services:
     build:
       dockerfile: ./dockerfiles/backend.dockerfile
       context: .
+    restart: unless-stopped
+    volumes:
+      # don't redownload the model after every build
+      - ./backend/AI_emails/models:/app/backend/AI_emails/models
     ports:
       - "8000:8000"
     depends_on:
       - mysql
+    # pass nvidia GPU if it exists
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 #
 #  frontend:
 #    build:
 #      dockerfile: frontend.Dockerfile
 #      context: .
+#    restart: unless-stopped
 #    ports:
 #      - "80:3000"
 #    depends_on:

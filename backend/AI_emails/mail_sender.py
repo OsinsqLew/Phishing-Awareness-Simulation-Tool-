@@ -3,8 +3,12 @@ from email.mime.text import MIMEText
 
 from backend.AI_emails.mail_content_generator import MailContentGenerator
 
-MAIL_SENDER = 'example@gmail.com'
-MAIL_PASSWORD = '<PASSWORD>'
+import setup.config as config
+
+MAIL_SENDER = config.get_from_config("config.ini", "gmail")["mail_sender"]
+MAIL_PASSWORD = config.get_from_config("config.ini", "gmail")["mail_password"]
+
+PUBLIC_IP_ADDRESS = config.get_from_config("config.ini", "server")["ip_addr"]
 
 
 def send_email(subject: str, html_body: str, recipients: list[str]) -> None:
@@ -61,7 +65,7 @@ def generate_n_send(db, recipient, recipient_email, recipient_id, user_tags):
     message = f'''
     <html>
         <body>{message}</body>
-        <img src="http://localhost:8000/track/report_phising.png" width="10" height="10">
+        <img src="http://{PUBLIC_IP_ADDRESS}:8000/track/report_phising.png" width="10" height="10">
     </html>'''
     send_email(subject, message, [recipient_email])
     db.add_user_email(recipient_id, tags["persona"], user_tags)
