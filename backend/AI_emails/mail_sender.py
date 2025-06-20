@@ -58,13 +58,14 @@ def send_email(subject: str, html_body: str, recipients: list[str]) -> None:
 def generate_n_send(db, recipient, recipient_email, recipient_id, user_tags):
     mcg = MailContentGenerator()
     link = db.generate_phishing_link(recipient_id)
+    ref = link.split("?")[-1]
     print(f"Generated link: {link}")
     subject, message, tags = mcg.generate_email(recipient, link, user_tags)
     print(f"Tags: {tags}")
     message = f'''
     <html>
         <body>{message}</body>
-        <img src="http://{PUBLIC_IP_ADDRESS}:8000/track/report_phising.png" width="10" height="10">
+        <img src="http://{PUBLIC_IP_ADDRESS}:8000/track/report_phising.png?reference={ref}" width="10" height="10">
     </html>'''
     send_email(subject, message, [recipient_email])
     db.add_user_email(recipient_id, tags["persona"], user_tags)

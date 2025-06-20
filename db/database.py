@@ -117,7 +117,7 @@ class DB:
     def login(self, email, password) -> tuple[str, str] | None:
         """Checks if hash of given password is equal to the hash in the database."""
         query = (
-            f"SELECT id, salt, hash_pass FROM Users WHERE email_address = %s;"
+            f"SELECT id, salt, hash_pass FROM users WHERE email_address = %s;"
         )
         cursor = self.my_db.cursor()
         try:
