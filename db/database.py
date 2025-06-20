@@ -8,6 +8,8 @@ import hashlib
 import base64
 import json
 
+#TODO sprawdzic user id - int, poprawic w verify token
+
 def decode_phishing_link(encoded_link: str) -> dict:
     """
     Decodes a phishing link to extract user and mail IDs.
@@ -47,7 +49,7 @@ class DB:
         cursor.close()
         return result[0] if result else 0
 
-    def verify_token(self, user_id:str, token:str) -> bool:
+    def verify_token(self, user_id: int, token: str) -> bool:
         try:
             decoded = jwt.decode(token, key=self.secret, algorithms=["HS256"])
         except Exception as e:
@@ -109,7 +111,7 @@ class DB:
         finally:
             cursor.close()
     
-    def login(self, email, password) -> str | None:
+    def login(self, email, password) -> tuple[str, str] | None:
         """Checks if hash of given password is equal to the hash in the database."""
         query = (
             f"SELECT id, salt, hash_pass FROM Users WHERE email_address = %s;"
@@ -128,7 +130,7 @@ class DB:
             print(f"{str(password_hash) == given_hash}")
             if str(password_hash) == given_hash:
                 token = { "id": user_id, "end_time": f"{(datetime.now() + timedelta(hours=1)).strftime("%Y-%m-%d %H:%M:%S")}" }
-                token = jwt.encode(token, key=self.secret["secret"], algorithm="HS256")
+                token = jwt.encode(token, key=self.secret, algorithm="HS256")
                 return user_id, token
             else:
                 raise Exception("Invalid credentials.")
@@ -214,7 +216,6 @@ class DB:
         
         Args:
             user_id (int): The ID of the user.
-            mail_id (int): The ID of the email.
 
         Returns:
             str: A formatted phishing link.

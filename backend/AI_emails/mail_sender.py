@@ -5,7 +5,7 @@ from backend.AI_emails.config import MAIL_SENDER, MAIL_PASSWORD
 from backend.AI_emails.mail_content_generator import MailContentGenerator
 
 
-def send_email(subject: str, html_body: str, recipients: list[str]) -> None:
+def send_email(subject: str, html_body: str, recipient: str) -> None:
     """
     Sends an HTML email with the specified subject and body to a list of recipients.
 
@@ -37,14 +37,14 @@ def send_email(subject: str, html_body: str, recipients: list[str]) -> None:
     msg = MIMEText(html_body, 'html')
     msg['Subject'] = subject
     msg['From'] = MAIL_SENDER
-    msg['To'] = ', '.join(recipients.values())  # FIXME:
-    print(f"Sending email to: {', '.join(recipients.values())}")  # FIXME:
+    msg['To'] = recipient
+    print(f"Sending email to: {recipient}")
 
     # connect to the SMTP server and send the email
     with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
         smtp_server.set_debuglevel(True)  # prints more info
         smtp_server.login(MAIL_SENDER, MAIL_PASSWORD)
-        smtp_server.sendmail(MAIL_SENDER, recipients.values(), msg.as_string())  # FIXME:
+        smtp_server.sendmail(MAIL_SENDER, recipient, msg.as_string())
 
     print("Email sent!")
 
@@ -54,7 +54,8 @@ def generate_n_send(db, recipient, recipient_email, recipient_id, user_tags):
     mcg = MailContentGenerator()
     link = db.generate_phishing_link(recipient_id)
     print(f"Generated link: {link}")
-    subject, message = mcg.generate_email(recipient, link, user_tags)
+    subject, message, tags = mcg.generate_email(recipient, link, user_tags)
+    print(f"Tags: {tags}")
     message = f'<html><body>{message}</body><img src="https://localhost:8000/track/report_phising.png" width="10" height="10"></html>'
-    send_email(subject, message, {recipient: recipient_email})  # FIXME:
-    db.add_user_email(recipient_id, None, None)
+    send_email(subject, message, recipient_email)
+    db.add_user_email(recipient_id, tags["persona"], user_tags)

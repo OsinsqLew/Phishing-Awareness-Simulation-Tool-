@@ -109,7 +109,7 @@ def get_statistics():
     Returns:
         A dictionary with the statistics.
     """
-    data = db.get_all_users()
+    data = db.get_all_user_stats()
     return data
 
 @app.get("/home_page")

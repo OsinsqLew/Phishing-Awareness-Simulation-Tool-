@@ -8,7 +8,6 @@ import random
 import re
 from llama_cpp import Llama
 
-
 def progress_bar(count, block_size, total_size):
     """
     A reporthook function to display AI model download progress bar.
@@ -111,6 +110,8 @@ class MailContentGenerator:
             n_threads=self.n_threads,
         )
 
+        self.email_tags = None
+
     def build_messages(self, tags, idx: int | None = None) -> list[dict[str, str]]:
         """
         Builds a list of messages to be used as input for the language model.
@@ -126,10 +127,13 @@ class MailContentGenerator:
         if idx is None:
             idx = random.randrange(len(self.scenarios))
         s = self.scenarios[idx]
+
+        self.email_tags = s
+
         user_prompt = (
             f"Generate one phishing email **as if sent by an <{s['persona']}> persona**. "
             f"The scenario is {s['hook']}. "
-            f"The tags describing targeted person are: {', '.join(tags)}, use that information to personalize the email. "
+            f"The tags describing targeted person are: {', '.join(tags)}, use some of them to personalize the email. "
             "Remember the output format and safety rules."
         )
         return [
@@ -194,4 +198,4 @@ class MailContentGenerator:
         body = re.sub(r"\[LINK]", f'<a href="{link}">Link</a>', body_extracted, flags=re.IGNORECASE).strip()
         body = body.replace("\n", "<br>")
 
-        return subject, body
+        return subject, body, self.email_tags
