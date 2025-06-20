@@ -9,12 +9,14 @@ from db.database import DB
 app = FastAPI()
 db = DB("DB_connection")
 
+
 class CreateUserRequest(BaseModel):
     email_address: str
     first_name: str
     last_name: str
     password: str
     tags: str | None = None
+
 
 @app.post("/create_user")
 def create_user(request: CreateUserRequest) -> dict:
@@ -37,7 +39,8 @@ def create_user(request: CreateUserRequest) -> dict:
         return {"message": "User created successfully."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+
 @app.post("/login")
 def login(email: str, password: str) -> dict:
     """
@@ -103,6 +106,7 @@ def get_user_statistics(user_id: int, token: str) -> dict:
         else:
             raise HTTPException(status_code=500, detail="An error occurred while fetching user statistics.")
 
+
 @app.get("/statistics")
 def get_statistics():
     """Get statistics from the database.
@@ -112,6 +116,7 @@ def get_statistics():
     """
     data = db.get_all_user_stats()
     return data
+
 
 @app.get("/home_page")
 def email_clicked(reference: str):
@@ -129,6 +134,7 @@ def email_clicked(reference: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing phishing link: {str(e)}")
     return {"message": "Phishing link clicked!"}
+
 
 @app.get("/track/report_phising.png")
 def track_report_phishing(reference: str):

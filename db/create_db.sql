@@ -1,4 +1,4 @@
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
 id INT AUTO_INCREMENT PRIMARY KEY,
 email_address VARCHAR(255) UNIQUE,
 first_name VARCHAR(63),
@@ -9,7 +9,7 @@ tags VARCHAR(63) DEFAULT NULL,
 CHECK (email_address REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
 );
 
-CREATE TABLE emails (
+CREATE TABLE IF NOT EXISTS emails (
 email_id INT NOT NULL,
 user_id INT NOT NULL,
 seen BOOLEAN DEFAULT FALSE,

@@ -1,18 +1,24 @@
 import smtplib
 from email.mime.text import MIMEText
 
-from backend.AI_emails.config import MAIL_SENDER, MAIL_PASSWORD
 from backend.AI_emails.mail_content_generator import MailContentGenerator
 
+import setup.config as config
 
-def send_email(subject: str, html_body: str, recipient: str) -> None:
+MAIL_SENDER = config.get_from_config("config.ini", "gmail")["mail_sender"]
+MAIL_PASSWORD = config.get_from_config("config.ini", "gmail")["mail_password"]
+
+PUBLIC_IP_ADDRESS = config.get_from_config("config.ini", "server")["ip_addr"]
+
+
+def send_email(subject: str, html_body: str, recipients: list[str]) -> None:
     """
     Sends an HTML email with the specified subject and body to a list of recipients.
 
     Parameters:
         subject (str): The subject line of the email.
         html_body (str): The HTML content of the email body.
-        recipients (list of dicts): A list of dictiopnaries that map recipients to theirs email addresses.
+        recipients (list of str):  A list of recipient email addresses.
 
     Returns:
         None
@@ -37,14 +43,14 @@ def send_email(subject: str, html_body: str, recipient: str) -> None:
     msg = MIMEText(html_body, 'html')
     msg['Subject'] = subject
     msg['From'] = MAIL_SENDER
-    msg['To'] = recipient
-    print(f"Sending email to: {recipient}")
+    msg['To'] = ', '.join(recipients)
+    print(f"Sending email to: {', '.join(recipients)}")
 
     # connect to the SMTP server and send the email
     with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
         smtp_server.set_debuglevel(True)  # prints more info
         smtp_server.login(MAIL_SENDER, MAIL_PASSWORD)
-        smtp_server.sendmail(MAIL_SENDER, recipient, msg.as_string())
+        smtp_server.sendmail(MAIL_SENDER, recipients, msg.as_string())
 
     print("Email sent!")
 
@@ -55,6 +61,10 @@ def generate_n_send(db, recipient, recipient_email, recipient_id, user_tags):
     print(f"Generated link: {link}")
     subject, message, tags = mcg.generate_email(recipient, link, user_tags)
     print(f"Tags: {tags}")
-    message = f'<html><body>{message}</body><img src="https://localhost:8000/track/report_phising.png" width="10" height="10"></html>'
-    send_email(subject, message, recipient_email)
+    message = f'''
+    <html>
+        <body>{message}</body>
+        <img src="http://{PUBLIC_IP_ADDRESS}:8000/track/report_phising.png" width="10" height="10">
+    </html>'''
+    send_email(subject, message, [recipient_email])
     db.add_user_email(recipient_id, tags["persona"], user_tags)

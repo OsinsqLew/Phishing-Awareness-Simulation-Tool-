@@ -3,6 +3,8 @@ import db.database as database
 import random
 
 db = database.DB("DB_connection")
+
+
 def main(user_id):
     email, first_name, last_name, tags = db.get_user_data(user_id, db.secret).values()
     print(f"User ID: {user_id}, Email: {email}, Name: {first_name} {last_name}, Tags: {tags}")
@@ -13,6 +15,7 @@ def main(user_id):
         user_id,
         tags
     )
+
 
 if __name__ == "__main__":
     # Example usage
