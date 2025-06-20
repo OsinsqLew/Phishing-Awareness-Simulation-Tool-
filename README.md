@@ -59,8 +59,9 @@ git clone https://github.com/OsinsqLew/Phishing-Awareness-Simulation-Tool-
 cd Phishing-Awareness-Simulation-Tool-
 curl -L "https://huggingface.co/TheBloke/zephyr-7B-beta-GGUF/resolve/main/zephyr-7b-beta.Q4_K_M.gguf?download=true" --create-dirs -o "./backend/AI_emails/models/zephyr-7b-beta.Q4_K_M.gguf"
 ```
-Zmodyfikować `config.ini` i następnie `docker-compose up`\
-Udostępnić niezbędne porty z `Security Groups`
+Połączyć się z instancją po SSH: `ssh -i <key>.pem ec2-user@<ip_addr>`\
+Udostępnić niezbędne porty w `Security Groups`\
+Zmodyfikować `config.ini` oraz `docker-compose up`\
 
 <br>
 
