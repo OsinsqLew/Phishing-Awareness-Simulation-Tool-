@@ -35,13 +35,13 @@ services:
     depends_on:
       - mysql
     # pass nvidia GPU if it exists
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+#    deploy:
+#      resources:
+#        reservations:
+#          devices:
+#            - driver: nvidia
+#              count: 1
+#              capabilities: [gpu]
 #
 #  frontend:
 #    build:
