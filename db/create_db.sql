@@ -16,5 +16,6 @@ seen BOOLEAN DEFAULT FALSE,
 clicked BOOLEAN DEFAULT FALSE,
 tags VARCHAR(63),
 phishing_type VARCHAR(255) DEFAULT NULL,
+PRIMARY KEY (email_id, user_id),
 FOREIGN KEY (user_id) REFERENCES users(id)
 );
