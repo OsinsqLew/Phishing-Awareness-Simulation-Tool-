@@ -65,7 +65,7 @@ def generate_n_send(db, recipient, recipient_email, recipient_id, user_tags):
     message = f'''
     <html>
         <body>{message}</body>
-        <img src="http://{PUBLIC_IP_ADDRESS}:8000/track/report_phising.png?reference={ref}" width="10" height="10">
+        <img src="http://{PUBLIC_IP_ADDRESS}:8000/track/report_phising.png?{ref}" width="10" height="10">
     </html>'''
     send_email(subject, message, [recipient_email])
     db.add_user_email(recipient_id, tags["persona"], user_tags)
