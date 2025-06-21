@@ -1,0 +1,25 @@
+# This is an example config.ini file
+# Update this file with your data
+
+[server]
+# public ip of the server
+ip_addr = 127.0.0.1
+
+[DB_connection]
+# also update in docker-compose.yml
+host = mysql
+username = root
+password = cisco12345
+schema_name = phishing_emails
+
+[jwt]
+secret = cisco12345
+
+[ai_model]
+default_n_ctx = 4096
+default_n_threads = 2
+
+[gmail]
+mail_sender = example@gmail.com
+# https://myaccount.google.com/apppasswords
+mail_password = 1234 1234 1234 1234
