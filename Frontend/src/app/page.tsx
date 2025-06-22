@@ -17,12 +17,16 @@ export default function Home() {
   const [homePage, setHomePage] = useState<any>(null);
   const [phishingImg, setPhishingImg] = useState<string | null>(null);
 
+  // Tymczasowo udawaj, że użytkownik jest zalogowany
+  const fakeSession = { user: { token: "FAKE_TOKEN" } };
+  const sessionToUse = session || fakeSession;
+
   useEffect(() => {
-    if (session?.user?.token) {
-      getUserData(session.user.token).then(res => setUserData(res.data));
-      getUserStatistics(session.user.token).then(res => setUserStats(res.data));
-      getStatistics(session.user.token).then(res => setStats(res.data));
-      getHomePage(session.user.token).then(res => setHomePage(res.data));
+    if (sessionToUse.user.token) {
+      getUserData(sessionToUse.user.token).then(res => setUserData(res.data));
+      getUserStatistics(sessionToUse.user.token).then(res => setUserStats(res.data));
+      getStatistics(sessionToUse.user.token).then(res => setStats(res.data));
+      getHomePage(sessionToUse.user.token).then(res => setHomePage(res.data));
       trackReportPhishing().then(res => {
         const blob = new Blob([res.data], { type: "image/png" });
         setPhishingImg(URL.createObjectURL(blob));

@@ -10,15 +10,17 @@ export async function loginUser(email: string, password: string) {
   return axios.post(`${API_URL}/login`, { email, password });
 }
 
-export async function getUserData(token: string) {
+export async function getUserData(token: string, userId: number) {
   return axios.get(`${API_URL}/get_user_data`, {
     headers: { Authorization: `Bearer ${token}` },
+    params: { user_id: userId },
   });
 }
 
-export async function getUserStatistics(token: string) {
+export async function getUserStatistics(token: string, userId: number) {
   return axios.get(`${API_URL}/user_statistics`, {
     headers: { Authorization: `Bearer ${token}` },
+    params: { user_id: userId },
   });
 }
 

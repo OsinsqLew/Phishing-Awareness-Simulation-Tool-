@@ -1,6 +1,5 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { loginUser } from "@/lib/api";
 
 export default NextAuth({
   providers: [
@@ -11,21 +10,12 @@ export default NextAuth({
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        try {
-          const res = await loginUser(credentials!.email, credentials!.password);
-          if (res.data && res.data.token) {
-            return { id: res.data.id, email: credentials!.email, token: res.data.token };
-          }
-          return null;
-        } catch {
-          return null;
-        }
+        // Zwróć przykładowego użytkownika na potrzeby testów
+        return { id: 1, email: credentials?.email, token: "FAKE_TOKEN" };
       }
     })
   ],
-  session: {
-    strategy: "jwt"
-  },
+  session: { strategy: "jwt" },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
