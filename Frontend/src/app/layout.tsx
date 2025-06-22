@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
-
 import { QueryProvider } from "@/lib/query-client";
-
+import { SessionWrapper } from "./SessionWrapper";
 import "./globals.css";
 
 const space_grotesk = Space_Grotesk({
@@ -21,10 +20,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="pl">
       <QueryProvider>
         <body className={`${space_grotesk.variable} font-sans antialiased`}>
-          {children}
+          <SessionWrapper>{children}</SessionWrapper>
         </body>
       </QueryProvider>
     </html>
