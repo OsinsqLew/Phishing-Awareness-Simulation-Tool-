@@ -1,6 +1,7 @@
 import os
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
@@ -16,6 +17,15 @@ class CreateUserRequest(BaseModel):
     last_name: str
     password: str
     tags: str | None = None
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # lub ["*"] dla testów
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.post("/create_user")

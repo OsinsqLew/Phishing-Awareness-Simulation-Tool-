@@ -1,26 +1,8 @@
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI
 from backend.AI_emails.mail_sender import generate_n_send
 import db.database as database
 import random
 
-
-from backend.API import router as api_router
-
-app = FastAPI()
-
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # lub ["*"] dla testów
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-app.include_router(api_router)
-
+db = database.DB("DB_connection")
 
 
 def main(user_id):
