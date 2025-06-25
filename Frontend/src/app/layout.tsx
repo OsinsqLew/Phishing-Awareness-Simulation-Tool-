@@ -23,7 +23,9 @@ export default function RootLayout({
     <html lang="pl">
       <QueryProvider>
         <body className={`${space_grotesk.variable} font-sans antialiased`}>
-          <SessionWrapper>{children}</SessionWrapper>
+          {/*<SessionWrapper>*/}
+            {children}
+          {/*</SessionWrapper>*/}
         </body>
       </QueryProvider>
     </html>
