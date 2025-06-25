@@ -7,8 +7,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: cisco12345
       MYSQL_DATABASE: phishing_emails
-    ports:
-      - "3307:3306"
+#    ports:
+#      - "3306:3306"
 
   phpmyadmin:
     image: phpmyadmin:5.2-apache
@@ -43,12 +43,16 @@ services:
 #              count: 1
 #              capabilities: [gpu]
 #
+# FIXME: po skończeniu frontentu odkomentować
 #  frontend:
 #    build:
-#      dockerfile: frontend.Dockerfile
+#      dockerfile: ./dockerfiles/frontend.dockerfile
 #      context: .
 #    restart: unless-stopped
 #    ports:
 #      - "80:3000"
+#    environment:
+#      NEXT_PUBLIC_API_URL: http://backend:8000
+#      PORT: 3000
 #    depends_on:
 #      - backend
