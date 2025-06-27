@@ -21,6 +21,7 @@ export default NextAuth({
       if (user) {
         token.token = user.token;
         token.email = user.email;
+        token.user_id = user.id; // Dodaj user_id do tokena!
       }
       return token;
     },
