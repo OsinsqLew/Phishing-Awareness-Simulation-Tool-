@@ -1,20 +1,36 @@
 "use client";
 import { useEffect, useState } from "react";
 import { getUserData } from "@/lib/api";
+import { useSession } from "next-auth/react";
 
 export default function GetUserDataPage() {
+  const { data: session, status } = useSession();
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
-  
-  const token = "FAKE_TOKEN";
-  const userId = 1;
-
   useEffect(() => {
-    getUserData(token, userId)
-      .then(res => setData(res.data))
-      .catch(err => setError(err.message));
-  }, []);
+    if (status === "authenticated" && session?.user?.token && session?.user?.user_id) {
+      getUserData(session.user.token, session.user.user_id)
+        .then(res => setData(res.data))
+        .catch(err => setError(err.message));
+    }
+  }, [session, status]);
+
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white text-xl">
+        Ładowanie...
+      </div>
+    );
+  }
+
+  if (status !== "authenticated") {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white text-xl">
+        Musisz być zalogowany, aby zobaczyć dane użytkownika.
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-400">

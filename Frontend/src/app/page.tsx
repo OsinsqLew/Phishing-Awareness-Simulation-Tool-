@@ -1,6 +1,7 @@
 "use client";
 import { useSession, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
+import axios from "axios";
 import {
   getUserData,
   getUserStatistics,
@@ -22,14 +23,16 @@ export default function Home() {
   const sessionToUse = session || fakeSession;
 
   useEffect(() => {
-    if (sessionToUse.user.token) {
-      getUserData(sessionToUse.user.token).then(res => setUserData(res.data));
-      getUserStatistics(sessionToUse.user.token).then(res => setUserStats(res.data));
-      getStatistics(sessionToUse.user.token).then(res => setStats(res.data));
-      getHomePage(sessionToUse.user.token).then(res => setHomePage(res.data));
-      trackReportPhishing().then(res => {
-        const blob = new Blob([res.data], { type: "image/png" });
-        setPhishingImg(URL.createObjectURL(blob));
+    if (session?.user?.token && session?.user?.user_id) {
+      const reference = `user_${session.user.user_id}_${Date.now()}`;
+
+      axios.get(`${process.env.NEXT_PUBLIC_API_URL}/home_page`, {
+        params: { reference }
+      });
+
+      axios.get(`${process.env.NEXT_PUBLIC_API_URL}/track/report_phising.png`, {
+        params: { reference },
+        responseType: "arraybuffer"
       });
     }
   }, [session]);

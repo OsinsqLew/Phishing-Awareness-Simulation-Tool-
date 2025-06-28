@@ -2,47 +2,51 @@ import axios from "axios";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-export async function createUser(email: string, password: string) {
+export async function createUser(email: string, password: string, firstName: string, lastName: string, tags?: string) {
   return axios.post(
-      `${API_URL}/create_user`,
-      // FIXME: brakuje danych
-      { email_address: email, password, first_name: 'fixme', last_name: 'fixme', tags: 'fixme' }
+    `${API_URL}/create_user`,
+    {
+      email_address: email,
+      password,
+      first_name: firstName,
+      last_name: lastName,
+      tags: tags || ""
+    }
   );
 }
 
 export async function loginUser(email: string, password: string) {
 
-  return axios.post(`${API_URL}/login`, { email, password });
+  return axios.post(`${API_URL}/login`, null, {
+    params: { email, password }
+  });
 }
 
 export async function getUserData(token: string, userId: number) {
   return axios.get(`${API_URL}/get_user_data`, {
-    headers: { Authorization: `Bearer ${token}` },
-    params: { user_id: userId },
+    params: { user_id: userId, token }
   });
 }
 
 export async function getUserStatistics(token: string, userId: number) {
   return axios.get(`${API_URL}/user_statistics`, {
-    headers: { Authorization: `Bearer ${token}` },
-    params: { user_id: userId },
+    params: { user_id: userId, token }
   });
 }
 
-export async function getStatistics(token: string) {
-  return axios.get(`${API_URL}/statistics`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export async function getStatistics() {
+  return axios.get(`${API_URL}/statistics`);
 }
 
-export async function getHomePage(token: string) {
+export async function getHomePage(reference: string) {
   return axios.get(`${API_URL}/home_page`, {
-    headers: { Authorization: `Bearer ${token}` },
+    params: { reference }
   });
 }
 
-export async function trackReportPhishing() {
+export async function trackReportPhishing(reference: string) {
   return axios.get(`${API_URL}/track/report_phising.png`, {
-    responseType: "arraybuffer",
+    params: { reference },
+    responseType: "arraybuffer"
   });
 }
