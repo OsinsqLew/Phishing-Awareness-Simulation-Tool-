@@ -67,6 +67,16 @@ Zmodyfikować `config.ini` oraz `docker-compose up`\
 
 ## Zrzuty ekranu
 
+![Screenshot_20250629_144612](https://github.com/user-attachments/assets/3223a2fb-cf79-4ded-b155-1e3f36dd5612)
+![Screenshot_20250629_144629](https://github.com/user-attachments/assets/b6883f20-97fa-48c5-99f1-3a81feda3654)
+![Screenshot_20250629_144640](https://github.com/user-attachments/assets/8708219d-a6f0-4899-bb1b-ed9ddf267ffb)
+![Screenshot_20250629_144749](https://github.com/user-attachments/assets/63f92367-9cfc-48bc-be05-324b3f0d8134)
+![Screenshot_20250629_144757](https://github.com/user-attachments/assets/26b8e84f-06fa-4edb-9613-db17d0e32f70)
+![Screenshot_20250629_144806](https://github.com/user-attachments/assets/66f0be8b-6307-4b38-aaf0-c7729acf5796)
+![Screenshot_20250629_144820](https://github.com/user-attachments/assets/aa1d59f0-bf31-4fa7-9d88-346c2b5c187c)
+
+
+
 ![users](https://github.com/user-attachments/assets/c7a455a3-b40d-4d9c-9fa5-9011d46380d4)
 ![emails](https://github.com/user-attachments/assets/544e2c19-57a5-480b-abc6-8b626f68ca39)
 
