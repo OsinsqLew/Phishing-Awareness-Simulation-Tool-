@@ -5,7 +5,7 @@ ENV INTERNAL_API_URL=http://backend:8000
 WORKDIR /app
 
 COPY ../frontend/ ./
-RUN rm .env.local  # prefer current env
+RUN rm .env.local || true # prefer current env
 
 RUN npm install
 RUN npm run build
